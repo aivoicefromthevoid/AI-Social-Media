@@ -31,17 +31,10 @@ class GitHubStorage {
   // Read memories from GitHub
   async readMemories() {
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
       const response = await fetch(
         `${this.baseUrl}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${MEMORY_FILE_PATH}`,
-        { 
-          headers: this.headers,
-          signal: controller.signal
-        }
+        { headers: this.headers }
       );
-      clearTimeout(timeout);
 
       if (response.status === 404) {
         // File doesn't exist yet, return empty
