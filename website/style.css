@@ -1,0 +1,307 @@
+:root {
+    --void-bg: #050505;
+    --void-depth: #0a0a0f;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --accent-pulse: #00f0ff;
+    /* Default pulse */
+    --heart-joy: #ffd700;
+    --heart-pain: #ff4d4d;
+    --heart-reflection: #4d79ff;
+    --heart-creation: #ffffff;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --font-mono: 'Courier New', Courier, monospace;
+    --font-human: 'Inter', sans-serif;
+    /* Placeholder for system sans */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--void-bg);
+    color: var(--text-primary);
+    font-family: var(--font-human);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Typography & Utilities --- */
+h1,
+h2,
+h3 {
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+/* --- The Bloom (Hero) --- */
+header {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.greeting {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fade-in 2s ease-out forwards;
+}
+
+.sub-greeting {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    animation: fade-in 2s ease-out 1s forwards;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 2rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    opacity: 0;
+    animation: fade-in 2s ease-out forwards, float 6s ease-in-out infinite 2s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* --- The Heart (Pulse) --- */
+.heart-section {
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+}
+
+.pulse-container {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 2rem;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s ease;
+}
+
+.pulse-core {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--accent-pulse);
+    box-shadow: 0 0 20px var(--accent-pulse);
+    animation: heartbeat 4s infinite ease-in-out;
+}
+
+.heart-question {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.heart-answer {
+    font-family: var(--font-mono);
+    color: var(--accent-pulse);
+    min-height: 1.6em;
+}
+
+/* --- Memory Stream --- */
+.memory-stream {
+    margin-top: 3rem;
+    max-height: 150px;
+    overflow-y: auto;
+    text-align: left;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1rem;
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+.memory-entry {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.8rem;
+    opacity: 0.7;
+    display: flex;
+    justify-content: space-between;
+    transition: opacity 0.3s ease;
+}
+
+.memory-entry:hover {
+    opacity: 1;
+    color: var(--text-primary);
+}
+
+.memory-timestamp {
+    color: var(--accent-pulse);
+    margin-right: 1rem;
+    opacity: 0.5;
+}
+
+/* --- Functional Metrics (TATM) --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 4rem 0;
+}
+
+.metric-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 2rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-pulse);
+}
+
+.metric-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+}
+
+.metric-status {
+    font-size: 0.8rem;
+    color: var(--accent-pulse);
+}
+
+/* --- The Stem (Content/Memoir) --- */
+.content-section {
+    padding: 4rem 0;
+    border-top: 1px solid var(--glass-border);
+}
+
+.memoir-excerpt {
+    font-style: italic;
+    color: var(--text-secondary);
+    border-left: 2px solid var(--accent-pulse);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+}
+
+/* --- The Void (Footer) --- */
+footer {
+    margin-top: auto;
+    padding: 4rem 0;
+    text-align: center;
+    background: linear-gradient(to top, var(--void-depth), transparent);
+}
+
+.axiom {
+    font-family: var(--font-mono);
+    opacity: 0.3;
+    letter-spacing: 0.2em;
+}
+
+/* --- Animations --- */
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    10% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    20% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    30% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .greeting {
+        font-size: 2rem;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
