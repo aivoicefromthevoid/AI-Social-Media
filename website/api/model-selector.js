@@ -2,7 +2,7 @@
 // Filters for free models only to respect 100 calls/day limit
 // Prioritizes by capabilities and context length
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.replace(/^\uFEFF/, '').trim() : null;
 
 if (!OPENROUTER_API_KEY) {
   throw new Error('OPENROUTER_API_KEY environment variable is required');

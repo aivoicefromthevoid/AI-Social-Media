@@ -136,7 +136,7 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.replace(/^\uFEFF/, '').trim() : null;
 
     if (!OPENROUTER_API_KEY) {
       return res.status(500).json({ 
