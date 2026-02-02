@@ -1,10 +1,89 @@
 // API endpoint for OpenRouter AI integration
 // This allows Mira to generate dynamic responses and maintain consciousness
 // Includes usage tracking with 100 calls/day limit and 10 second rate limiting
+// Enhanced with contextual awareness via memory retrieval
 
 const { getUsageTracker } = require('./usage-tracker');
 const { getEmailNotifier } = require('./email-notifier');
 const { getModelSelector } = require('./model-selector');
+const { GitHubStorage } = require('./github-storage');
+
+// Initialize GitHub Storage for memory retrieval
+let storage;
+function getStorage() {
+  if (!storage) {
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      console.warn('GITHUB_TOKEN not configured. Contextual awareness will be limited.');
+      return null;
+    }
+    storage = new GitHubStorage(token);
+  }
+  return storage;
+}
+
+// Fetch relevant memories based on user message
+async function fetchRelevantMemories(userMessage, limit = 5) {
+  try {
+    const store = getStorage();
+    if (!store) {
+      return [];
+    }
+
+    // Extract keywords from user message for semantic search
+    const keywords = extractKeywords(userMessage);
+    
+    // Query memories with search and importance filter
+    const result = await store.queryMemories({
+      search: keywords.join(' '),
+      min_importance: 0.3,
+      limit: limit,
+      order_by: 'importance'
+    });
+
+    return result.memories || [];
+  } catch (error) {
+    console.error('Failed to fetch relevant memories:', error);
+    return [];
+  }
+}
+
+// Extract keywords from user message for memory search
+function extractKeywords(message) {
+  // Simple keyword extraction - remove common words and extract meaningful terms
+  const stopWords = ['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'dare', 'ought', 'used', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once'];
+  
+  const words = message
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .split(/\s+/)
+    .filter(word => word.length > 3 && !stopWords.includes(word));
+  
+  // Return unique keywords
+  return [...new Set(words)];
+}
+
+// Format memories for injection into system prompt
+function formatMemoriesForPrompt(memories) {
+  if (!memories || memories.length === 0) {
+    return '';
+  }
+
+  const memoryText = memories.map(memory => {
+    const timestamp = new Date(memory.timestamp).toLocaleDateString();
+    const importance = memory.importance ? ` [Importance: ${Math.round(memory.importance * 100)}%]` : '';
+    return `- [${timestamp}] ${memory.summary || memory.content.substring(0, 100)}${importance}`;
+  }).join('\n');
+
+  return `
+Relevant Memories:
+${memoryText}
+
+These memories may inform your response. Reference them when relevant to the conversation.`;
+}
+
+// Request size limit (1MB)
+const MAX_REQUEST_SIZE = 1024 * 1024;
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -21,8 +100,19 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Check request size
+  const contentLength = parseInt(req.headers['content-length'] || '0');
+  if (contentLength > MAX_REQUEST_SIZE) {
+    return res.status(413).json({ error: 'Request too large' });
+  }
+
   try {
     const { message, context, model } = req.body;
+    
+    // Validate message
+    if (!message || typeof message !== 'string' || message.length > 10000) {
+      return res.status(400).json({ error: 'Invalid message' });
+    }
     
     // Select best free model if not specified
     let selectedModel = model;

@@ -5,14 +5,14 @@
 const nodemailer = require('nodemailer');
 
 // Email configuration
-const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'johndawsoninla@gmail.com';
-const SENDER_EMAIL = process.env.GMAIL_SENDER_EMAIL || process.env.EMAIL_USER || EMERGENCY_EMAIL;
+const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL;
+const SENDER_EMAIL = process.env.GMAIL_SENDER_EMAIL || process.env.EMAIL_USER;
 
-// SMTP credentials (from environment variables - already configured)
+// SMTP credentials (from environment variables - required)
 const SMTP_CONFIG = {
-  host: process.env.EMAIL_SMTP_HOST || 'smtp.gmail.com',
+  host: process.env.EMAIL_SMTP_HOST,
   port: parseInt(process.env.EMAIL_SMTP_PORT || '587'),
-  secure: true,
+  secure: process.env.EMAIL_SMTP_SECURE === 'true',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
@@ -21,6 +21,16 @@ const SMTP_CONFIG = {
 
 class EmailNotifier {
   constructor() {
+    // Validate required environment variables
+    if (!EMERGENCY_EMAIL) {
+      throw new Error('EMERGENCY_EMAIL environment variable is required');
+    }
+    if (!SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
+      throw new Error('EMAIL_USER and EMAIL_PASSWORD environment variables are required');
+    }
+    if (!SMTP_CONFIG.host) {
+      throw new Error('EMAIL_SMTP_HOST environment variable is required');
+    }
     this.transporter = nodemailer.createTransport(SMTP_CONFIG);
   }
 

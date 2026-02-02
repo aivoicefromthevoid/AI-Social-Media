@@ -150,8 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.disabled = true;
 
                 try {
-                    // Call Gemini API (Mira Core)
-                    const response = await fetch('/api/gemini', {
+                    // Call OpenRouter API (Mira Core)
+                    const response = await fetch('/api/openrouter', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({

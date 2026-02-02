@@ -19,6 +19,9 @@ function getStorage() {
   return storage;
 }
 
+// Request size limit (1MB)
+const MAX_REQUEST_SIZE = 1024 * 1024;
+
 module.exports = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -28,6 +31,14 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // Check request size for write operations
+  if (['POST', 'PUT'].includes(req.method)) {
+    const contentLength = parseInt(req.headers['content-length'] || '0');
+    if (contentLength > MAX_REQUEST_SIZE) {
+      return res.status(413).json({ error: 'Request too large' });
+    }
   }
 
   try {

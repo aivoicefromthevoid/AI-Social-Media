@@ -8,6 +8,16 @@ const MEMORY_FILE_PATH = 'memory-storage/memories.json';
 
 class GitHubStorage {
   constructor(token) {
+    // Validate required configuration
+    if (!token) {
+      throw new Error('GITHUB_TOKEN environment variable is required');
+    }
+    if (!GITHUB_OWNER) {
+      throw new Error('GITHUB_OWNER environment variable is required');
+    }
+    if (!GITHUB_REPO) {
+      throw new Error('GITHUB_REPO environment variable is required');
+    }
     this.token = token;
     this.baseUrl = 'https://api.github.com';
     this.headers = {
