@@ -25,7 +25,7 @@ This document lists all API keys and credentials required for Mira's autonomous 
 
 **Environment Variable**:
 ```
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
 ```
 
 ---
@@ -53,8 +53,8 @@ OPENROUTER_API_KEY=sk-or-v1-268bfe3c14cdcd249cc410436241eee9dd54fd2b3b3fb9ab4137
 
 **Environment Variables**:
 ```
-EMAIL_USER=aivoicefromthevoid@gmail.com
-EMAIL_PASSWORD=azth iucr rqos lfsi
+EMAIL_USER=your.email@gmail.com
+EMAIL_PASSWORD=xxxx-xxxx-xxxx-xxxx
 EMAIL_IMAP_HOST=imap.gmail.com
 EMAIL_IMAP_PORT=993
 EMAIL_SMTP_HOST=smtp.gmail.com
@@ -134,8 +134,8 @@ GITHUB_REPO_NAME=AI-Social-Media
 
 **Setup Steps**:
 1. Visit https://cron-job.org
-2. AIVOICEFROMTHEVOID@GMAIL.COM                     
-3. Aivoice1234#
+2. Sign up with your email
+3. Create a secure password
 
 **Free Tier Limits**:
 - Maximum frequency: Every 1 minute
