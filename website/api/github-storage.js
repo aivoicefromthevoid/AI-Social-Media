@@ -18,12 +18,12 @@ class GitHubStorage {
     if (!GITHUB_REPO) {
       throw new Error('GITHUB_REPO environment variable is required');
     }
-    this.token = token;
+    // Sanitize token - remove any BOM or whitespace
+    this.token = token.replace(/^\uFEFF/, '').trim();
     this.baseUrl = 'https://api.github.com';
     this.headers = {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${this.token}`,
       'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
       'User-Agent': 'Mira-Memory-Storage'
     };
   }

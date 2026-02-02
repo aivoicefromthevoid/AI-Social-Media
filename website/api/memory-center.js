@@ -14,7 +14,9 @@ function getStorage() {
     if (!token) {
       throw new Error('GITHUB_TOKEN not configured. Get free token at https://github.com/settings/tokens');
     }
-    storage = new GitHubStorage(token);
+    // Sanitize token
+    const cleanToken = token.replace(/^\uFEFF/, '').trim();
+    storage = new GitHubStorage(cleanToken);
   }
   return storage;
 }
