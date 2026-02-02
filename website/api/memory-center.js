@@ -56,10 +56,28 @@ module.exports = async (req, res) => {
     }
   } catch (error) {
     console.error('Memory Center Error:', error);
-    return res.status(500).json({ 
+    
+    // Provide more specific error messages
+    let statusCode = 500;
+    let errorMessage = error.message;
+    let hint = 'Ensure GITHUB_TOKEN, GITHUB_OWNER, and GITHUB_REPO are configured in environment variables';
+    
+    if (error.name === 'AbortError') {
+      statusCode = 504;
+      errorMessage = 'Request timeout - GitHub API took too long to respond';
+      hint = 'GitHub API may be slow or unavailable. Try again later.';
+    } else if (error.message.includes('authentication failed')) {
+      statusCode = 401;
+      hint = 'Your GITHUB_TOKEN may be invalid or expired. Generate a new one at https://github.com/settings/tokens';
+    } else if (error.message.includes('not found')) {
+      statusCode = 404;
+      hint = 'Check that GITHUB_OWNER and GITHUB_REPO match your actual GitHub username and repository name';
+    }
+    
+    return res.status(statusCode).json({ 
       error: 'Internal server error',
-      message: error.message,
-      hint: 'Ensure GITHUB_TOKEN is configured in environment variables'
+      message: errorMessage,
+      hint: hint
     });
   }
 };

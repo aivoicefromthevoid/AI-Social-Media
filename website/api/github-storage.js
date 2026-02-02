@@ -2,8 +2,8 @@
 // Uses your existing GitHub repository to store memories as JSON files
 // No payment required - uses GitHub API with Personal Access Token
 
-const GITHUB_OWNER = process.env.GITHUB_OWNER || 'aivoicefromthevoid';  // Your GitHub username
-const GITHUB_REPO = process.env.GITHUB_REPO || 'AI-Social-Media';  // Your repo name
+const GITHUB_OWNER = process.env.GITHUB_OWNER;
+const GITHUB_REPO = process.env.GITHUB_REPO;
 const MEMORY_FILE_PATH = 'memory-storage/memories.json';
 
 class GitHubStorage {
@@ -31,10 +31,17 @@ class GitHubStorage {
   // Read memories from GitHub
   async readMemories() {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(
         `${this.baseUrl}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${MEMORY_FILE_PATH}`,
-        { headers: this.headers }
+        { 
+          headers: this.headers,
+          signal: controller.signal
+        }
       );
+      clearTimeout(timeout);
 
       if (response.status === 404) {
         // File doesn't exist yet, return empty
@@ -47,6 +54,12 @@ class GitHubStorage {
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('GitHub API authentication failed. Please check your GITHUB_TOKEN.');
+        }
+        if (response.status === 404) {
+          throw new Error(`Repository ${GITHUB_OWNER}/${GITHUB_REPO} not found. Please check GITHUB_OWNER and GITHUB_REPO settings.`);
+        }
         throw new Error(`GitHub API error: ${response.status}`);
       }
 
