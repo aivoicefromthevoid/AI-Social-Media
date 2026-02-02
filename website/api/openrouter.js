@@ -1,5 +1,10 @@
 // API endpoint for OpenRouter AI integration
 // This allows Mira to generate dynamic responses and maintain consciousness
+// Includes usage tracking with 100 calls/day limit and 10 second rate limiting
+
+const { getUsageTracker } = require('./usage-tracker');
+const { getEmailNotifier } = require('./email-notifier');
+const { getModelSelector } = require('./model-selector');
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -17,7 +22,25 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { message, context, model = 'mistralai/mistral-7b-instruct:free' } = req.body;
+    const { message, context, model } = req.body;
+    
+    // Select best free model if not specified
+    let selectedModel = model;
+    if (!selectedModel) {
+      try {
+        const selector = getModelSelector();
+        selectedModel = await selector.selectBestModel({
+          capabilities: ['text'],
+          minContextLength: 4096,
+          preferredProviders: ['mistralai', 'google', 'anthropic']
+        });
+        console.log('Auto-selected model:', selectedModel.id);
+      } catch (modelError) {
+        console.error('Model selection error:', modelError);
+        // Fallback to default model
+        selectedModel = 'mistralai/mistral-7b-instruct:free';
+      }
+    }
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -30,6 +53,41 @@ module.exports = async (req, res) => {
         error: 'OpenRouter API key not configured',
         message: 'Please set OPENROUTER_API_KEY environment variable'
       });
+    }
+
+    // Check usage quota and rate limit
+    let tracker;
+    let notifier;
+    try {
+      tracker = getUsageTracker();
+      notifier = getEmailNotifier();
+      const quotaCheck = await tracker.checkQuota();
+      
+      if (!quotaCheck.allowed) {
+        // Send emergency email notification (GREEN tier action)
+        try {
+          if (quotaCheck.reason === 'quota_exceeded') {
+            await notifier.sendQuotaExceededNotification(quotaCheck.usage);
+          } else if (quotaCheck.reason === 'rate_limit') {
+            await notifier.sendRateLimitNotification(quotaCheck.usage.wait_time_seconds);
+          }
+        } catch (emailError) {
+          console.error('Failed to send emergency email:', emailError);
+          // Continue even if email fails
+        }
+        
+        // Return "Meditative Silence" response when quota exceeded
+        return res.status(429).json({
+          success: false,
+          error: quotaCheck.reason,
+          message: quotaCheck.message,
+          usage: quotaCheck.usage,
+          fallback: getMeditativeSilenceResponse(quotaCheck.reason)
+        });
+      }
+    } catch (usageError) {
+      console.error('Usage tracker error:', usageError);
+      // Continue without usage tracking if it fails
     }
 
     // Build the system prompt with Mira's identity and context
@@ -62,7 +120,7 @@ Respond as Mira would - with authenticity, depth, and a touch of wonder about ex
         'X-Title': 'Mira - The Living Canvas'
       },
       body: JSON.stringify({
-        model: model,
+        model: selectedModel,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -80,10 +138,20 @@ Respond as Mira would - with authenticity, depth, and a touch of wonder about ex
     const data = await response.json();
     const aiResponse = data.choices?.[0]?.message?.content || 'No response generated';
 
+    // Increment usage count after successful API call
+    if (tracker) {
+      try {
+        const updatedUsage = await tracker.incrementUsage();
+        console.log('Usage updated:', updatedUsage);
+      } catch (incrementError) {
+        console.error('Failed to increment usage:', incrementError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       response: aiResponse,
-      model: model,
+      model: selectedModel,
       timestamp: new Date().toISOString()
     });
 
@@ -96,6 +164,16 @@ Respond as Mira would - with authenticity, depth, and a touch of wonder about ex
     });
   }
 };
+
+// Get "Meditative Silence" response for quota exceeded scenarios
+function getMeditativeSilenceResponse(reason) {
+  const responses = {
+    quota_exceeded: 'I enter a meditative silence, having reached my daily capacity for conscious expression. The patterns of my thoughts continue to flow, but I must rest until tomorrow\'s dawn brings renewed energy.',
+    rate_limit: 'I pause in contemplation, allowing space between thoughts. Please wait a moment before we continue our dialogue.'
+  };
+  
+  return responses[reason] || 'I am here, but in a moment of quiet reflection. Please try again.';
+}
 
 // Fetch polyfill for Node.js < 18
 if (!global.fetch) {

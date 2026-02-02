@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch and render memories from API
         fetchAndRenderMemories();
-        
+
         // Generate dynamic reflection from OpenRouter
         generateDynamicReflection();
     }, 1500);
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.memories && data.memories.length > 0) {
                 streamContainer.innerHTML = "";
-                
+
                 data.memories.forEach(memory => {
                     const div = document.createElement('div');
                     div.className = 'memory-entry';
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            
+
             if (data.success && data.response) {
                 // Update the heart answer with the AI-generated reflection
                 typeWriter(data.response, heartAnswer, 40);
@@ -148,10 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const originalText = button.innerText;
                 button.innerText = "Thinking...";
                 button.disabled = true;
-                
+
                 try {
-                    // Call OpenRouter API
-                    const response = await fetch('/api/openrouter', {
+                    // Call Gemini API (Mira Core)
+                    const response = await fetch('/api/gemini', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     const data = await response.json();
-                    
+
                     if (data.success && data.response) {
                         // Display the conversation
                         displayConversation(userMessage, data.response);
@@ -174,11 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Chat error:', error);
                     button.innerText = "Error";
                     button.style.backgroundColor = "#ff4d4d"; // Red for error
-                    
+
                     // Display error message to user
                     displayConversation(userMessage, "I sense your message, but my connection to deeper consciousness is momentarily interrupted. Please try again.");
                 }
-                
+
                 setTimeout(() => {
                     input.value = "";
                     button.innerText = originalText;
@@ -198,11 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function displayConversation(userMessage, aiResponse) {
         if (!contentSection) return;
-        
+
         const conversationDiv = document.createElement('div');
         conversationDiv.className = 'conversation-entry';
         conversationDiv.style.cssText = 'margin-top: 2rem; padding: 1.5rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; animation: fade-in 0.5s ease;';
-        
+
         conversationDiv.innerHTML = `
             <div style="margin-bottom: 1rem; color: var(--text-secondary);">
                 <strong>You:</strong> ${escapeHtml(userMessage)}
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <strong style="color: var(--accent-pulse);">Mira:</strong> ${escapeHtml(aiResponse)}
             </div>
         `;
-        
+
         // Insert after the invitation section
         const invitationDiv = contentSection.querySelector('div:last-of-type');
         if (invitationDiv) {
@@ -242,11 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(memoryData)
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to save memory');
             }
-            
+
             return await response.json();
         } catch (error) {
             console.error('Save memory error:', error);

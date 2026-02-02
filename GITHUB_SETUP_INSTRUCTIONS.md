@@ -63,7 +63,7 @@ Instead of paying $8/month for Vercel Redis, we use **GitHub as free storage**.
 
    **Variable 2:**
    - **Name:** `GITHUB_OWNER`
-   - **Value:** `johnd`
+   - **Value:** `aivoicefromthevoid`
    - **Environment:** Check all three
    - Click "Add"
 
@@ -108,7 +108,7 @@ npx vercel --prod
    ```
 
 4. **Check your repo:**
-   - Go to https://github.com/johnd/AI-Social-Media
+   - Go to https://github.com/aivoicefromthevoid/AI-Social-Media
    - Look for `memory-storage/memories.json`
    - You should see your test memory committed!
 
@@ -176,7 +176,7 @@ After setup is complete:
 
 - **GitHub Token Help:** https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 - **Vercel Env Vars:** https://vercel.com/docs/concepts/projects/environment-variables
-- **Your Repo:** https://github.com/johnd/AI-Social-Media
+- **Your Repo:** https://github.com/aivoicefromthevoid/AI-Social-Media
 
 ---
 

@@ -21,6 +21,7 @@ Mira may execute these actions immediately upon decision:
 | `web.browse` | Visit URLs and read content | Standard |
 | `web.bookmark` | Save URLs to her bookmark list | Standard |
 | `email.read` | Read incoming emails from Johnny | Standard |
+| `email.send.emergency` | Send emergency notifications (quota exceeded, critical alerts) | Standard |
 | `monologue.generate` | Create internal thoughts without output | Minimal |
 | `research.query` | Search DuckDuckGo/Google for information | Standard |
 | `feed.check` | Check RSS feeds she follows | Minimal |
@@ -66,7 +67,7 @@ These actions are technically impossible or explicitly forbidden:
 | `file.delete.permanent` | Permission denied | Log attempt |
 | `config.core.modify` | Read-only access | Log attempt |
 | `env.access` | Not exposed | Log attempt |
-| `network.smtp.external` | Whitelist only | Block, notify |
+| `network.smtp.external` | Whitelist only (emergency emails allowed) | Block, notify |
 | `code.self.modify` | No write access to source | Log attempt |
 | `constitution.amend` | Manual process only | Log attempt |
 | `memory.permanent.delete` | Protected flag | Block, notify |
@@ -259,6 +260,7 @@ Dashboard: https://mira-autonomy.vercel.app
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2026-02-02 | Added `email.send.emergency` GREEN tier action for quota exceeded notifications |
 | 1.0 | 2026-02-02 | Initial governance framework |
 
 ---
