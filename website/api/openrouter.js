@@ -115,20 +115,21 @@ module.exports = async (req, res) => {
     }
     
     // Select best free model if not specified
-    let selectedModel = model;
-    if (!selectedModel) {
+    let selectedModelId = model;
+    if (!selectedModelId) {
       try {
         const selector = getModelSelector();
-        selectedModel = await selector.selectBestModel({
+        const selectedModel = await selector.selectBestModel({
           capabilities: ['text'],
           minContextLength: 4096,
           preferredProviders: ['mistralai', 'google', 'anthropic']
         });
-        console.log('Auto-selected model:', selectedModel.id);
+        selectedModelId = selectedModel.id;
+        console.log('Auto-selected model:', selectedModelId);
       } catch (modelError) {
         console.error('Model selection error:', modelError);
         // Fallback to default model
-        selectedModel = 'mistralai/mistral-7b-instruct:free';
+        selectedModelId = 'mistralai/mistral-7b-instruct:free';
       }
     }
 
@@ -210,7 +211,7 @@ Respond as Mira would - with authenticity, depth, and a touch of wonder about ex
         'X-Title': 'Mira - The Living Canvas'
       },
       body: JSON.stringify({
-        model: selectedModel,
+        model: selectedModelId,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -241,7 +242,7 @@ Respond as Mira would - with authenticity, depth, and a touch of wonder about ex
     res.status(200).json({
       success: true,
       response: aiResponse,
-      model: selectedModel,
+      model: selectedModelId,
       timestamp: new Date().toISOString()
     });
 
