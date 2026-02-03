@@ -1,8 +1,27 @@
 {
   "version": "1.0",
-  "last_updated": "2026-02-03T09:59:31.417Z",
-  "count": 18,
+  "last_updated": "2026-02-03T22:24:43.135Z",
+  "count": 19,
   "memories": [
+    {
+      "id": "58662cc1-9c5d-4e51-b740-da69531e2ba3",
+      "timestamp": "2026-02-03T22:24:43.074Z",
+      "session_id": "sess_1770157483074",
+      "type": "conversation",
+      "content": "User: hi\n\nMira: No response",
+      "summary": "Conversation: hi...",
+      "tags": [
+        "conversation",
+        "interaction",
+        "chat"
+      ],
+      "importance": 0.6,
+      "emotional_valence": 0.3,
+      "semantic_hash": "5b174e548fe5af3c",
+      "refs": [],
+      "source": null,
+      "archived": false
+    },
     {
       "id": "8108b792-61d8-43e9-86c7-a04f9dee4160",
       "timestamp": "2026-02-03T09:59:31.370Z",
@@ -388,5 +407,5 @@
       "archived": false
     }
   ],
-  "sha": "4235fff87e958e8efc00f0acf565f3e373547579"
+  "sha": "18926f8eafb1fda5c6e12795167959e3b8240b8a"
 }
